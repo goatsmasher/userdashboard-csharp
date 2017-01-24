@@ -1,0 +1,76 @@
+@{ ViewData["Title"] = @ViewBag.user.first_name+"'s profile"; }
+<h2>@ViewBag.user.first_name @ViewBag.user.last_name</h2>
+@{ if (@ViewBag.loggedin == @ViewBag.user.id){
+    <a href="/users/profile/@ViewBag.loggedin"><button type="button" class="btn btn-primary">Edit Profile</button></a>
+}}
+    <a href="/dashboard"><button type="button" class="btn btn-primary">Return to Dashboard</button></a>
+<div class="row">
+    <div class="col-sm-4">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">Registered At</th>
+                    <td>@ViewBag.user.created_at</td>
+                </tr>
+                <tr>
+                    <th scope="row">User ID:</th>
+                    <td>@ViewBag.user.id</td>
+                </tr>
+                <tr>
+                    <th scope="row">Email address:</th>
+                    <td>@ViewBag.user.email</td>
+                </tr>
+                <tr>
+                    <th scope="row">Description:</th>
+                    <td>@ViewBag.user.description</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div id="newmessage">
+        <h3>Leave a message for @ViewBag.user.first_name</h3>
+        <form action="/submit_message" method="POST">
+            <input type="hidden" name="user_id" value="@ViewBag.user.id">
+            <input type="hidden" name="author_id" value="@ViewBag.loggedin">
+            <textarea name="message"></textarea>
+            <input type="submit" class="btn btn-success">
+        </form>
+    </div>
+</div>
+@{
+    foreach (var item in @ViewBag.users_wall) {
+        <div class="row">
+            <div class="messages">
+                <p>@{ foreach(var yo in @ViewBag.allusers){
+                    if (@yo.id == item.author_id){
+                        <p>On @yo.created_at.ToString("MMM d") at @yo.created_at.ToString("HH:mm"), @yo.first_name @yo.last_name Wrote:</p>
+                    }}
+                    }
+                <textarea disabled placeholder="@item.message"></textarea>
+            </div>
+        </div>
+
+    foreach (var comment in @ViewBag.comments) {
+            if (@comment.messages_id == item.id) {
+            <div class="comments">    
+                <p>@{foreach (var yo in @ViewBag.allusers){
+                    if (@yo.id == comment.author_id){
+                        <p>@yo.first_name @yo.last_name Commented:</p>
+                    }}}
+                <textarea disabled placeholder="@comment.comment"></textarea>
+            </div>
+            }
+        }
+
+            <div>
+            <form action="/submit_comment" method="post">
+                <input type="hidden" name="author_id" value="@ViewBag.loggedin">
+                <input type="hidden" name="messages_id" value="@item.id">
+                <textarea name="comment" placeholder="Write a Comment"></textarea>
+                <input type="submit" class="btn btn-success" value="Post">
+            </form>
+            </div>
+    }
+}
